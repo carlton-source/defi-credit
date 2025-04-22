@@ -246,3 +246,33 @@
         (ok true)
     )
 )
+
+;; Update the list of a user's active loans
+(define-private (update-user-loans (user principal) (loan-id uint))
+    (let ((user-loans (default-to { active-loans: (list ) }
+            (map-get? UserLoans { user: user }))))
+        (map-set UserLoans
+            { user: user }
+            { active-loans: (unwrap! (as-max-len? 
+                (append (get active-loans user-loans) loan-id) u20)
+                ERR-ACTIVE-LOAN) })
+        (ok true)
+    )
+)
+
+;; Read-only Functions
+
+;; Get a user's current credit score and loan history
+(define-read-only (get-user-score (user principal))
+    (map-get? UserScores { user: user })
+)
+
+;; Get details of a specific loan
+(define-read-only (get-loan (loan-id uint))
+    (map-get? Loans { loan-id: loan-id })
+)
+
+;; Get a user's active loans
+(define-read-only (get-user-active-loans (user principal))
+    (map-get? UserLoans { user: user })
+)
